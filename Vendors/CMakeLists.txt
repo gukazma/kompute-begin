@@ -1,1 +1,2 @@
 add_subdirectory(kompute)
+add_subdirectory(renderdoc)

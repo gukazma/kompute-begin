@@ -20,6 +20,7 @@ target_link_libraries(${TARGET_NAME}
             ${PROJECT_NAME}::Primitives
             GTest::gtest GTest::gtest_main
             kompute::kompute
+            renderdoc::api
 )
 
 target_include_directories(

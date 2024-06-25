@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <kompute/Kompute.hpp>
-
+#include <api/app/renderdoc_app.h>
+#include <Windows.h>
 static std::vector<uint32_t> compileSource(const std::string& source)
 {
     std::ofstream fileOut("tmp_kp_shader.comp");
@@ -17,6 +18,15 @@ static std::vector<uint32_t> compileSource(const std::string& source)
 
 void kompute(const std::string& shader)
 {
+    RENDERDOC_API_1_1_2* rdoc_api = NULL;
+
+    if (HMODULE mod = GetModuleHandleA("renderdoc.dll")) {
+        pRENDERDOC_GetAPI RENDERDOC_GetAPI =
+            (pRENDERDOC_GetAPI)GetProcAddress(mod, "RENDERDOC_GetAPI");
+        int ret = RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_1_2, (void**)&rdoc_api);
+        assert(ret == 1);
+    }
+
 
     // 1. Create Kompute Manager with default settings (device 0, first queue and no extensions)
     kp::Manager mgr;
@@ -54,19 +64,20 @@ void kompute(const std::string& shader)
         ->record<kp::OpAlgoDispatch>(algorithm, pushConstsB)   // Overrides push consts
         ->eval();   // Evaluates only last recorded operation
 
+
     // 5. Sync results from the GPU asynchronously
     auto sq = mgr.sequence();
     sq->evalAsync<kp::OpTensorSyncLocal>(params);
 
-    // ... Do other work asynchronously whilst GPU finishes
 
+    // ... Do other work asynchronously whilst GPU finishes
     sq->evalAwait();
 
     // Prints the first output which is: { 4, 8, 12 }
     for (const float& elem : tensorOutA->vector()) std::cout << elem << "  ";
     // Prints the second output which is: { 10, 10, 10 }
     for (const float& elem : tensorOutB->vector()) std::cout << elem << "  ";
-
+    if (rdoc_api) rdoc_api->EndFrameCapture(NULL, NULL);
 }   // Manages / releases all CPU and GPU memory resources
 
 
@@ -92,7 +103,7 @@ TEST(MYTEST0, A)
 
         // Kompute also supports spec constants on initalization
         layout(constant_id = 0) const float const_one = 0;
-
+    
         void main() {
             uint index = gl_GlobalInvocationID.x;
             out_a[index] += uint( in_a[index] * in_b[index] );
