@@ -19,6 +19,7 @@ target_link_libraries(${TARGET_NAME}
       PRIVATE
             ${PROJECT_NAME}::Primitives
             GTest::gtest GTest::gtest_main
+            kompute::kompute
 )
 
 target_include_directories(

@@ -1,3 +1,6 @@
 [submodule "vcpkg"]
 	path = vcpkg
 	url = https://github.com/microsoft/vcpkg.git
+[submodule "Vendors/kompute"]
+	path = Vendors/kompute
+	url = https://github.com/KomputeProject/kompute.git

@@ -12,7 +12,7 @@ endif ()
 project(CppTemplateProject VERSION 0.1 LANGUAGES CXX)
 
 option(ENABLE_DOCS "Enable doxygen docs" ON)
-option(ENABLE_QTAPP "Enable config Qt app" ON)
+option(ENABLE_QTAPP "Enable config Qt app" OFF)
 
 # just for qt
 # set(CMAKE_AUTOUIC ON)
@@ -65,3 +65,6 @@ if(DOT_EXE)
   )
   set_target_properties(${PROJECT_NAME}DependencyGraph PROPERTIES FOLDER Tools)
 endif()
+
+
+add_subdirectory(Vendors)
